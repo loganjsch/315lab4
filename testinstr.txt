@@ -1,0 +1,4 @@
+add $t0, $a0, $a1
+addi $t0, $a1, 12
+sub $t0, $a1, $a0
+addi $t0, $a0, 8
