@@ -18,6 +18,7 @@ public class lab4 {
     public static String[] pipeline = new String[4];
     public static int cyclecount = 0;
     public static pipelineQueue pipeQueue = new pipelineQueue();
+    public static int takenflag = 0;
 
     // This function finds and maps labels in the code 
     public static HashMap<String, Integer> mapLabels(String fname){
@@ -241,6 +242,7 @@ public class lab4 {
                         printPipeline();
                     }
                     else if (userIn[0].equals("s")){
+                        takenflag = 0;
                         if (pc < asmarray.length){
                             if (pipeQueue.isEmpty()){
                                 instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
@@ -272,6 +274,7 @@ public class lab4 {
                         // run whole program
                         int count = 0;
                         while (pc < asmarray.length) {
+                            takenflag = 0;
                             if (pipeQueue.isEmpty()){
                                 instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
                                 registers = operation.execute_instruction();
@@ -303,6 +306,7 @@ public class lab4 {
 
                     else if (userIn[0].equals("c")){
                         // clear registers, memory (pc == 0)
+                        takenflag = 0;
                         for (Entry<String, Integer> entry : registers.entrySet()) {
                             entry.setValue(0);
                         }
@@ -321,6 +325,7 @@ public class lab4 {
                     // code for s num
                     int count = 0;
                     while (count < Integer.parseInt(userIn[1])){
+                        takenflag = 0;
                         if (pc < asmarray.length){ 
                             instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
                             registers = operation.execute_instruction();

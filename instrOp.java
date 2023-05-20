@@ -119,6 +119,7 @@ public class instrOp {
             int reg2 = get_register(arr[2]);
             if (reg1 != reg2){
                 lab4.pc = labelMap.get(arr[3]) - 1; // -1 because completing this instruction pc++
+                lab4.takenflag = 1;
             }
 
         }
@@ -127,6 +128,7 @@ public class instrOp {
             int reg2 = get_register(arr[2]);
             if (reg1 == reg2){
                 lab4.pc = labelMap.get(arr[3]) - 1; // -1 because completing this instruction pc++
+                lab4.takenflag = 1;
             }
 
         }
