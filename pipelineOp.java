@@ -30,13 +30,29 @@ public class pipelineOp {
             }
         }
         /* if prev isntr = lw and this one uses same register */
-        if (prevInstName.equals("lw") && arr.includes(prevarr[1]))
-        /* I don't really understand the logic of this one. Need to figure out the fist test example. */
+        if (prevInstName.equals("lw")){
         
-        /* if isntr = anything that doesnt cause delay */
-        else {
-            lab4.pipeQueue.stage(instName);
+            String prevlw = prevarr[1];
+            
+            boolean sameRegister = false;
+            for (int i = 1; i < arr.length; i++) {
+                if (arr[i].equals(prevlw)) {
+                    sameRegister = true;
+                    break;
+                }
+            }
+            if (sameRegister){
+                lab4.pipeQueue.stage(instName);
+                lab4.pipeQueue.stage("stall");
+                lab4.pipeQueue.stage("nop");
+                lab4.pipeQueue.stage("nop");
+            }else{
+                lab4.pipeQueue.stage(instName);
+            }
+            
         }
-    }
+        
+    
 
+    }
 }
