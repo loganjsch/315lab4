@@ -11,14 +11,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Map.Entry;
 
-public class lab4 {
+public class lab3 {
 
     public static int[] datamemory = new int[8192];
     public static int pc = 0;
-    public static String[] pipeline = new String[4];
-    public static int cyclecount = 0;
-    public static pipelineQueue pipeQueue = new pipelineQueue();
-    public static int takenflag = 0;
 
     // This function finds and maps labels in the code 
     public static HashMap<String, Integer> mapLabels(String fname){
@@ -178,29 +174,29 @@ public class lab4 {
         return registers;
     }
 
-    public static void printPipeline(){
-        System.out.println("if/id	id/exe	exe/mem	mem/wb");
-        for (String register : pipeline) {
-			System.out.print(register + "    ");
-		}
-        System.out.println();
-    }
-
-    public static void insertInPipe(String instName){
-        pipeline[3] = pipeline[2];
-        pipeline[2] = pipeline[1];
-        pipeline[1] = pipeline[0];
-        pipeline[0] = instName;
-        cyclecount++;
-    }
-
-
+    
     public static void main(String[] args) throws FileNotFoundException, IOException{
 
+        //System.out.println(args.length);
+
         String[] asmarray = readASM(args[0]);
+
+        /*
+        for (String line : asmarray){
+            System.out.println(line);
+        }
+        */
+
         HashMap<String, Integer> labelMap = mapLabels(args[0]);
+
+        /* 
+        System.out.println("Label Table:");
+        for (Entry<String, Integer> entry : labelMap.entrySet()) {
+            System.out.println(entry.getKey() + " = " + entry.getValue());
+        }
+        */
+
         HashMap<String, Integer> registers = createRegistersMap();
-        Arrays.fill(pipeline, "empty");
     
         // registers are null going into this 
         if (args.length == 1) {
@@ -237,77 +233,33 @@ public class lab4 {
                             count++;
                         }
                     }
-                    else if (userIn[0].equals("p")){
-                        // print pipeline 
-                        printPipeline();
-                    }
                     else if (userIn[0].equals("s")){
-                        takenflag = 0;
                         if (pc < asmarray.length){
-                            if (pipeQueue.isEmpty()){
-                                instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
-                                registers = operation.execute_instruction();
-                                System.out.println("1 instruction completed.");
-    
-                                if (pc == 0){
-                                    pipelineOp firstPipeOp = new pipelineOp(asmarray[pc], "doesnotexist");
-                                    firstPipeOp.executeInstr();
-                                }
-                                else {
-                                    pipelineOp pipeOp = new pipelineOp(asmarray[pc], asmarray[pc - 1]);
-                                    pipeOp.executeInstr();
-                                }
-                                pc++;
-    
-                            }
-                            pipeQueue.printQueue();
-                            insertInPipe(pipeQueue.getFirst());
-                            System.out.println("Cycle count is at: " + cyclecount);
-                            System.out.println("Pc is at: " + pc);
-                            printPipeline();
+                            instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
+                            registers = operation.execute_instruction();
+                            // single step through instructions
+                            pc++;
+                            System.out.println("1 instruction completed.");
                         }
                         else {
-                            System.out.println("Program finished. Please clear.");
+                            System.out.println("Program Completed. Please clear.");
                         }
                     }
                     else if (userIn[0].equals("r")){
                         // run whole program
                         int count = 0;
                         while (pc < asmarray.length) {
-                            takenflag = 0;
-                            if (pipeQueue.isEmpty()){
-                                instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
-                                registers = operation.execute_instruction();
-                                System.out.println("1 instruction completed.");
-    
-                                if (pc == 0){
-                                    pipelineOp firstPipeOp = new pipelineOp(asmarray[pc], "doesnotexist");
-                                    firstPipeOp.executeInstr();
-                                }
-                                else {
-                                    pipelineOp pipeOp = new pipelineOp(asmarray[pc], asmarray[pc - 1]);
-                                    pipeOp.executeInstr();
-                                }
-                                pc++;
-                                count++;
-    
-                            }
-                            pipeQueue.printQueue();
-                            insertInPipe(pipeQueue.getFirst());
-                            System.out.println("Cycle count is at: " + cyclecount);
-                            System.out.println("Pc is at: " + pc);
-                            printPipeline();
-                            
+                            instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
+                            registers = operation.execute_instruction();
+                            pc++;
+                            count++;
                         }
-                        System.out.println("Program Completed.");
-                        Double cpi = (double)cyclecount / count;
-                        String formattedCPI = String.format("%.2f", cpi);
-                        System.out.println("CPI = " + formattedCPI + "  Cycles = " + cyclecount + "  Instructions = " + count);       
+                        System.out.println("Program Completed. Please clear.");
+                        System.out.println(count + " instruction(s) completed.");            
                     }
 
                     else if (userIn[0].equals("c")){
                         // clear registers, memory (pc == 0)
-                        takenflag = 0;
                         for (Entry<String, Integer> entry : registers.entrySet()) {
                             entry.setValue(0);
                         }
@@ -315,8 +267,6 @@ public class lab4 {
                             datamemory[i] = 0;
                         }
                         pc = 0;
-                        cyclecount = 0;
-                        Arrays.fill(pipeline, "empty");
                     }
                     else if (userIn[0].equals("q")){
                         // exit program 
@@ -326,7 +276,6 @@ public class lab4 {
                     // code for s num
                     int count = 0;
                     while (count < Integer.parseInt(userIn[1])){
-                        takenflag = 0;
                         if (pc < asmarray.length){ 
                             instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
                             registers = operation.execute_instruction();
@@ -402,76 +351,31 @@ public class lab4 {
                             count++;
                         }
                     }
-                    else if (first.equals("p")){
-                        // print pipeline 
-                        printPipeline();
-                    }
                     else if (first.equals("s")){
-                        takenflag = 0;
                         if (pc < asmarray.length){
-                            if (pipeQueue.isEmpty()){
-                                instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
-                                registers = operation.execute_instruction();
-                                System.out.println("1 instruction completed.");
-    
-                                if (pc == 0){
-                                    pipelineOp firstPipeOp = new pipelineOp(asmarray[pc], "doesnotexist");
-                                    firstPipeOp.executeInstr();
-                                }
-                                else {
-                                    pipelineOp pipeOp = new pipelineOp(asmarray[pc], asmarray[pc - 1]);
-                                    pipeOp.executeInstr();
-                                }
-                                pc++;
-    
-                            }
-                            pipeQueue.printQueue();
-                            insertInPipe(pipeQueue.getFirst());
-                            System.out.println("Cycle count is at: " + cyclecount);
-                            System.out.println("Pc is at: " + pc);
-                            printPipeline();
+                            instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
+                            registers = operation.execute_instruction();
+                            // single step through instructions
+                            pc++;
+                            System.out.println("1 instruction completed.");
                         }
                         else {
-                            System.out.println("Program finished. Please clear.");
+                            System.out.println("Program Completed. Please clear.");
                         }
                     }
                     else if (first.equals("r")){
-                        // run whole program
                         int count = 0;
                         while (pc < asmarray.length) {
-                            takenflag = 0;
-                            if (pipeQueue.isEmpty()){
-                                instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
-                                registers = operation.execute_instruction();
-                                System.out.println("1 instruction completed.");
-    
-                                if (pc == 0){
-                                    pipelineOp firstPipeOp = new pipelineOp(asmarray[pc], "doesnotexist");
-                                    firstPipeOp.executeInstr();
-                                }
-                                else {
-                                    pipelineOp pipeOp = new pipelineOp(asmarray[pc], asmarray[pc - 1]);
-                                    pipeOp.executeInstr();
-                                }
-                                pc++;
-                                count++;
-    
-                            }
-                            pipeQueue.printQueue();
-                            insertInPipe(pipeQueue.getFirst());
-                            System.out.println("Cycle count is at: " + cyclecount);
-                            System.out.println("Pc is at: " + pc);
-                            printPipeline();
-                            
+                            instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
+                            registers = operation.execute_instruction();
+                            pc++;
+                            count++;
                         }
-                        System.out.println("Program Completed.");
-                        Double cpi = (double)cyclecount / count;
-                        String formattedCPI = String.format("%.2f", cpi);
-                        System.out.println("CPI = " + formattedCPI + "  Cycles = " + cyclecount + "  Instructions = " + count); 
+                        System.out.println("Program Completed. Please clear.");
+                        System.out.println(count + " instruction(s) completed.");
                     }
                     else if(first.equals("c")){
                         // clear registers, memory (pc == 0)
-                        takenflag = 0;
                         for (Entry<String, Integer> entry : registers.entrySet()) {
                             entry.setValue(0);
                         }
@@ -479,8 +383,6 @@ public class lab4 {
                             datamemory[j] = 0;
                         }
                         pc = 0;
-                        cyclecount = 0;
-                        Arrays.fill(pipeline, "empty");
                     }
                     else if (first.equals("q")){
                         // exit program 
@@ -488,10 +390,9 @@ public class lab4 {
                     }
                 }
                 else if (lines.get(i).size() == 2 && lines.get(i).get(0).equals("s")){
-                    // code for s num
+                    int instrNum = Integer.parseInt(lines.get(i).get(1));
                     int count = 0;
-                    while (count < Integer.parseInt(lines.get(i).get(1))){
-                        takenflag = 0;
+                    while (count < instrNum){
                         if (pc < asmarray.length){ 
                             instrOp operation = new instrOp(asmarray[pc], labelMap, registers);
                             registers = operation.execute_instruction();
@@ -500,10 +401,10 @@ public class lab4 {
                         }
                         else {
                             System.out.println("Reached the end of program. Please clear.");
-                            count = Integer.parseInt(lines.get(i).get(1));
+                            count = instrNum;
                         }       
                     }
-                    System.out.println(lines.get(i).get(1) + " instruction(s) completed.");
+                    System.out.println(instrNum + " instruction(s) completed.");
                 }
                 else if(lines.get(i).size() == 3 && lines.get(i).get(0).equals("m")){
                     int lower = Integer.parseInt(lines.get(i).get(1));
@@ -513,6 +414,7 @@ public class lab4 {
                     }
                 }
             }
+
         }
         else{
             System.out.println("Incorrect arguments passed!");
