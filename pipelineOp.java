@@ -21,7 +21,7 @@ public class pipelineOp {
         }
 
         /* if isntr = b taken */
-        if (instName.equals("bne") || (instName.equals("beq"))) {
+        else if (instName.equals("bne") || (instName.equals("beq"))) {
             lab4.pipeQueue.stage(instName);
             if (lab4.takenflag == 1){
                 lab4.pipeQueue.stage("squash");
@@ -30,7 +30,7 @@ public class pipelineOp {
             }
         }
         /* if prev isntr = lw and this one uses same register */
-        if (prevInstName.equals("lw")){
+        else if (prevInstName.equals("lw")){
         
             String prevlw = prevarr[1];
             
@@ -44,12 +44,13 @@ public class pipelineOp {
             if (sameRegister){
                 lab4.pipeQueue.stage(instName);
                 lab4.pipeQueue.stage("stall");
-                lab4.pipeQueue.stage("nop");
-                lab4.pipeQueue.stage("nop");
             }else{
                 lab4.pipeQueue.stage(instName);
             }
             
+        }
+        else{
+            lab4.pipeQueue.stage(instName);
         }
         
     
