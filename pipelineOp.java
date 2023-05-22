@@ -35,6 +35,7 @@ public class pipelineOp {
             String prevlw = prevarr[1];
             
             boolean sameRegister = false;
+
             for (int i = 1; i < arr.length; i++) {
                 if (arr[i].equals(prevlw)) {
                     sameRegister = true;
@@ -42,6 +43,7 @@ public class pipelineOp {
                 }
             }
             if (sameRegister){
+                /* keep stall */
                 lab4.pipeQueue.stage(instName);
                 lab4.pipeQueue.stage("stall");
             }else{
@@ -53,7 +55,5 @@ public class pipelineOp {
             lab4.pipeQueue.stage(instName);
         }
         
-    
-
     }
 }

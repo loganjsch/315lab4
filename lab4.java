@@ -299,9 +299,10 @@ public class lab4 {
                             printPipeline();
                             
                         }
-                        System.out.println("Program Completed. Please clear.");
-                        System.out.println(cyclecount + " cycle(s) completed.");
-                        System.out.println(count + " instruction(s) completed.");            
+                        System.out.println("Program Completed.");
+                        Double cpi = (double)cyclecount / count;
+                        String formattedCPI = String.format("%.2f", cpi);
+                        System.out.println("CPI = " + formattedCPI + "  Cycles = " + cyclecount + "  Instructions = " + count);       
                     }
 
                     else if (userIn[0].equals("c")){
